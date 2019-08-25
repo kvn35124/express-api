@@ -1,7 +1,8 @@
 
+
 getChirps();
-postChirps();
-getChirps();
+$('#chirpButton').click(() => postChirps());
+$('#deleteChirp').click(() => deleteChirp());
 
 
 function getChirps() {
@@ -10,7 +11,7 @@ function getChirps() {
         type: 'GET'
     })
         .then(chirps => {
-    
+
             chirps.forEach(chirp => {
                 $('#timeline').append(`
                 <article class="col-md-7">
@@ -21,27 +22,38 @@ function getChirps() {
                         </div>
                         <div class="card-footer">
                             <p class="text-muted">${chirp.id}</p>
+                            <button onclick="deleteChirp(${chirp.id})" type="button" class="btn btn-danger" id="deleteChirp">X</button>
                         </div>
                     </div>
                 </article>
             `);
             })
-    
+
         });
 }
 
 function postChirps() {
-    $('#chirpButton').click(() => {
-        // event.preventDefault();
-        let userInput = $('#userInput').val();
-        let userChirp = $('#userChirp').val();
-        let chirp = {
-            user: userInput,
-            chirp: userChirp
-        }
-    })
+    let userInput = $('#userInput').val();
+    let userChirp = $('#userChirp').val();
+    let chirp = {
+        user: userInput,
+        chirp: userChirp
+    }
     $.post({
         url: '/api/chirps',
-        type: 'POST'
+        type: 'POST',
+        data: chirp
+    })
+    .then(() => console.log("Chirp Added!"))
+    .then(() => window.location.reload());
+}
+
+function deleteChirp(id) {
+    $.ajax({
+        url: `/api/chirps/${id}`,
+        type: 'DELETE'
+    })
+    .then(() => {
+        getChirps();
     })
 }
